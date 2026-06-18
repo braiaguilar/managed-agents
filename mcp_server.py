@@ -14,14 +14,11 @@ import functools
 import httpx
 from fastmcp import FastMCP
 
-# ── Constantes ─────────────────────────────────────────────────────────────────
 _BASE = "https://pokeapi.co/api/v2"
 
-# Cliente sincrónico reutilizable; FastMCP ejecuta las tools en un thread pool.
 _client = httpx.Client(timeout=10.0)
 
 
-# ── Capa de red ────────────────────────────────────────────────────────────────
 @functools.lru_cache(maxsize=512)
 def _get_json(url: str) -> dict:
     """GET a url y devuelve el JSON parseado.
@@ -36,7 +33,6 @@ def _get_json(url: str) -> dict:
     return resp.json()
 
 
-# ── Helpers de dominio ─────────────────────────────────────────────────────────
 def _fetch_pokemon(name: str) -> dict:
     """Extrae los campos relevantes de /pokemon/{name}."""
     data = _get_json(f"{_BASE}/pokemon/{name}")
@@ -44,8 +40,8 @@ def _fetch_pokemon(name: str) -> dict:
         "id":         data["id"],
         "name":       data["name"],
         "types":      [t["type"]["name"] for t in data["types"]],
-        "height":     data["height"],   # decímetros
-        "weight":     data["weight"],   # hectogramos
+        "height":     data["height"],
+        "weight":     data["weight"],
         "base_stats": {s["stat"]["name"]: s["base_stat"] for s in data["stats"]},
         "abilities":  [a["ability"]["name"] for a in data["abilities"]],
     }
@@ -87,7 +83,6 @@ def _fetch_evolution_chain(name: str) -> list[str]:
     return _walk_chain(chain_data["chain"])
 
 
-# ── Servidor MCP ───────────────────────────────────────────────────────────────
 mcp = FastMCP("PokeAPI MCP")
 
 
