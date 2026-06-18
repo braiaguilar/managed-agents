@@ -43,7 +43,14 @@ system_prompt_path = Path(__file__).parent / "system_prompt.txt"
 system_prompt = system_prompt_path.read_text(encoding="utf-8").strip()
 print(f"  System prompt  : {len(system_prompt)} caracteres leídos de system_prompt.txt")
 
-
+# MCP structure (two arrays with cross-references):
+#   mcp_servers[].name       — "pokeapi" (referenced by tools)
+#   tools[].mcp_server_name  — "pokeapi" (references the server)
+# The API rejects definitions with unreferenced servers or dangling toolsets.
+#
+# No agent_toolset_20260401 → least privilege: agent can only call the MCP tools.
+#
+# permission_policy "always_allow" → read-only tools run without confirmation.
 print("► [2/2] Creando agent...")
 agent = client.beta.agents.create(
     name="pokeapi-agent",
