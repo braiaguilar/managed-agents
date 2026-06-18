@@ -85,11 +85,11 @@ def _run_turn(session_id: str, user_text: str) -> bool:
                     print(f"\n[mcp]  {event.name}({args})", flush=True)
 
                 case "agent.tool_result" | "agent.mcp_tool_result":
-                    # Resultado de la tool; mostramos un resumen corto.
                     content = getattr(event, "content", None)
                     if content:
-                        summary = str(content)[:200].replace("\n", " ")
-                        print(f"\n       → {summary}", flush=True)
+                        parts = [getattr(b, "text", "") for b in content]
+                        summary = " ".join(p for p in parts if p) or str(content)
+                        print(f"\n       → {summary[:200].replace(chr(10), ' ')}", flush=True)
 
                 case "session.error":
                     # Error a nivel de session (ej. MCP server inalcanzable).
